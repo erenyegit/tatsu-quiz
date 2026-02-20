@@ -1,65 +1,169 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import type { CharacterKey } from "../lib/characters";
+
+type ChoiceKey = "A" | "B" | "C" | "D" | "E";
+
+type Option = { label: string; key: ChoiceKey };
+type Question = { title: string; options: Option[] };
+
+const questions: Question[] = [
+  {
+    title: "When facing a strong opponent, how do you act?",
+    options: [
+      { key: "A", label: "Stay calm and observe first" },
+      { key: "B", label: "Attack instantly without hesitation" },
+      { key: "C", label: "Analyze weaknesses and plan" },
+      { key: "D", label: "Do it your own way, no rules" },
+      { key: "E", label: "Endure and overpower them" },
+    ],
+  },
+  {
+    title: "What matters most in battle?",
+    options: [
+      { key: "A", label: "Precision and discipline" },
+      { key: "B", label: "Speed and aggression" },
+      { key: "C", label: "Strategy and control" },
+      { key: "D", label: "Freedom and instinct" },
+      { key: "E", label: "Strength and endurance" },
+    ],
+  },
+  {
+    title: "What defines your inner power?",
+    options: [
+      { key: "A", label: "Balance" },
+      { key: "B", label: "Chaos" },
+      { key: "C", label: "Intelligence" },
+      { key: "D", label: "Independence" },
+      { key: "E", label: "Determination" },
+    ],
+  },
+];
+
+const mapLetterToCharacter: Record<ChoiceKey, CharacterKey> = {
+  A: "epseo",
+  B: "katsuro",
+  C: "mesmer",
+  D: "ukase",
+  E: "fushi",
+};
+
+function computeResult(answers: ChoiceKey[]): CharacterKey {
+  const counts: Record<ChoiceKey, number> = { A: 0, B: 0, C: 0, D: 0, E: 0 };
+  for (const a of answers) counts[a]++;
+
+  let best: ChoiceKey = answers[answers.length - 1] ?? "A";
+  for (const k of Object.keys(counts) as ChoiceKey[]) {
+    if (counts[k] > counts[best]) best = k;
+  }
+  return mapLetterToCharacter[best];
+}
+
+export default function HomePage() {
+  const router = useRouter();
+  const [step, setStep] = useState(0);
+  const [answers, setAnswers] = useState<ChoiceKey[]>([]);
+
+  const current = questions[step];
+  const progressPercent = useMemo(
+    () => (100 * (step + 1)) / questions.length,
+    [step]
+  );
+  const progressLabel = useMemo(
+    () => `${Math.min(step + 1, questions.length)} / ${questions.length}`,
+    [step]
+  );
+
+  function pick(optionKey: ChoiceKey) {
+    const next = [...answers];
+    next[step] = optionKey;
+    setAnswers(next);
+
+    if (step < questions.length - 1) {
+      setStep(step + 1);
+      return;
+    }
+
+    const result = computeResult(next);
+    router.push(`/result/${result}`);
+  }
+
+  function back() {
+    if (step === 0) return;
+    setStep(step - 1);
+  }
+
+  function reset() {
+    setStep(0);
+    setAnswers([]);
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen flex items-center justify-center p-4 sm:p-6 text-white">
+      <div className="w-full max-w-xl neon-card p-6 sm:p-8 page-enter">
+        {/* Üst: logo + progress */}
+        <div className="flex items-center justify-between gap-4">
+          <span className="font-display text-sm font-semibold tracking-wide text-white/90">
+            TATSU TYPE
+          </span>
+          <span className="text-xs font-medium tabular-nums text-white/60">
+            {progressLabel}
+          </span>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Progress bar */}
+        <div className="mt-3 progress-track">
+          <div
+            className="progress-fill"
+            style={{ width: `${progressPercent}%` }}
+          />
         </div>
-      </main>
-    </div>
+
+        {/* Soru */}
+        <h1 className="mt-8 font-display text-xl sm:text-2xl font-bold leading-tight neon-title">
+          {current.title}
+        </h1>
+
+        {/* Seçenekler */}
+        <div className="mt-6 grid gap-3">
+          {current.options.map((opt, i) => (
+            <button
+              key={opt.key}
+              onClick={() => pick(opt.key)}
+              className="option-item neon-btn flex items-center gap-4 px-4 py-3.5 text-left rounded-2xl"
+              style={{ animationDelay: `${i * 50}ms` }}
+            >
+              <span className="option-badge">{opt.key}</span>
+              <span className="text-sm font-medium text-white/95">
+                {opt.label}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {/* Alt: Back + Restart */}
+        <div className="mt-8 flex gap-3">
+          <button
+            onClick={back}
+            className="neon-btn rounded-xl px-4 py-2.5 text-sm font-medium disabled:opacity-40 disabled:pointer-events-none"
+            disabled={step === 0}
+          >
+            Back
+          </button>
+          <button
+            onClick={reset}
+            className="ml-auto neon-btn rounded-xl px-4 py-2.5 text-sm font-medium"
+          >
+            Restart
+          </button>
+        </div>
+
+        <p className="mt-6 text-[11px] text-white/50">
+          Unofficial community tool. Not affiliated with Tatsu.
+        </p>
+      </div>
+    </main>
   );
 }

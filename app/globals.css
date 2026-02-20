@@ -1,26 +1,234 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg0: #030106;
+  --bg1: #0a0512;
+  --bg2: #120a1c;
+  --neon1: #a855f7;
+  --neon2: #22d3ee;
+  --neon3: #f472b6;
+  --neon4: #c084fc;
+  --accent: #e879f9;
+  --glow-strong: rgba(168, 85, 247, 0.5);
+  --glow-soft: rgba(168, 85, 247, 0.15);
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-glow: rgba(168, 85, 247, 0.4);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: #faf5ff;
+  background:
+    radial-gradient(ellipse 140% 80% at 10% 0%, rgba(168, 85, 247, 0.2), transparent 50%),
+    radial-gradient(ellipse 100% 60% at 90% 10%, rgba(34, 211, 238, 0.15), transparent 45%),
+    radial-gradient(ellipse 80% 50% at 50% 100%, rgba(244, 114, 182, 0.12), transparent 45%),
+    linear-gradient(180deg, var(--bg1) 0%, var(--bg0) 100%);
+  overflow-x: hidden;
+}
+
+/* Scanlines – daha hafif */
+.scanlines::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.02),
+    rgba(255, 255, 255, 0.02) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  mix-blend-mode: overlay;
+  opacity: 0.6;
+}
+
+/* Film grain */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: -20%;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.2'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  transform: translateZ(0);
+}
+
+/* Ana kart – NFT / panel hissi */
+.neon-card {
+  position: relative;
+  border: 1px solid var(--border-subtle);
+  background: linear-gradient(165deg, rgba(18, 10, 28, 0.85) 0%, rgba(3, 1, 6, 0.92) 100%);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    0 0 60px -15px var(--glow-soft);
+}
+
+.neon-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 24px;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--neon1), var(--neon2), var(--neon3), var(--neon4));
+  background-size: 300% 300%;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.5;
+  pointer-events: none;
+  animation: borderShift 8s ease infinite;
+}
+
+@keyframes borderShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Köşe vurgusu – anime UI */
+.neon-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-radius: 24px 24px 0 0;
+  background: linear-gradient(90deg, transparent, var(--neon1), var(--neon2), transparent);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Buton – seçenek kartları */
+.neon-btn {
+  border: 1px solid var(--border-subtle);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+  border-radius: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.neon-btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+  border-color: var(--border-glow);
+  box-shadow:
+    0 8px 24px -8px var(--glow-soft),
+    0 0 0 1px rgba(168, 85, 247, 0.2);
+}
+
+.neon-btn:active {
+  transform: translateY(0);
+}
+
+/* Başlık glow */
+.neon-title {
+  text-shadow:
+    0 0 20px var(--glow-soft),
+    0 0 40px rgba(168, 85, 247, 0.2);
+}
+
+/* Progress bar */
+.progress-track {
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--neon1), var(--neon2));
+  box-shadow: 0 0 12px var(--glow-strong);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Seçenek giriş animasyonu */
+@keyframes optionIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.option-item {
+  animation: optionIn 0.4s ease backwards;
+}
+
+/* Sayfa giriş */
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.page-enter {
+  animation: pageIn 0.35s ease-out;
+}
+
+/* Particles */
+.particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 999px;
+  opacity: 0.85;
+  filter: blur(0.2px);
+  animation: floatUp linear infinite;
+}
+
+@keyframes floatUp {
+  from {
+    transform: translate3d(0, 40vh, 0);
+    opacity: 0;
+  }
+  10% { opacity: 0.9; }
+  to {
+    transform: translate3d(0, -60vh, 0);
+    opacity: 0;
+  }
+}
+
+/* Badge (A, B, C…) */
+.option-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(34, 211, 238, 0.2));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-weight: 700;
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.font-display {
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
