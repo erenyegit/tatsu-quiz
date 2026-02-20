@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Particles from "./Particles";
+import InkBackground from "./InkBackground";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,11 +28,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased scanlines grain`}
       >
-        {/* neon dust particles */}
-        <Particles />
-
-        {/* your pages */}
-        {children}
+        {/* mürekkep arka plan + toz bulutları */}
+        <InkBackground />
+        <div className="relative z-10">{children}</div>
       </body>
     </html>
   );

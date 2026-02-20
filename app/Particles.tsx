@@ -20,9 +20,13 @@ export default function Particles() {
   const [dots, setDots] = useState<Dot[]>([]);
 
   useEffect(() => {
-    // sadece client'ta bir kere üret → hydration olmaz
-    const n = Math.floor(rand(45, 65));
-    const colors = ["rgba(124,58,237,0.95)", "rgba(6,182,212,0.95)", "rgba(244,63,94,0.85)"];
+    const n = Math.floor(rand(55, 85));
+    const colors = [
+      "rgba(168, 85, 247, 0.9)",
+      "rgba(34, 211, 238, 0.85)",
+      "rgba(244, 114, 182, 0.8)",
+      "rgba(192, 132, 252, 0.75)",
+    ];
 
     const generated: Dot[] = Array.from({ length: n }).map((_, i) => {
       const color = colors[Math.floor(rand(0, colors.length))];
@@ -30,9 +34,9 @@ export default function Particles() {
         id: i,
         left: rand(0, 100),
         top: rand(0, 100),
-        dur: rand(6, 14),
-        delay: rand(0, 8),
-        size: rand(1.5, 3.2),
+        dur: rand(8, 18),
+        delay: rand(0, 12),
+        size: rand(1.8, 4),
         color,
       };
     });
@@ -55,7 +59,8 @@ export default function Particles() {
             width: `${d.size}px`,
             height: `${d.size}px`,
             background: d.color,
-            boxShadow: `0 0 10px ${d.color}, 0 0 18px ${d.color}`,
+            color: d.color,
+            boxShadow: `0 0 ${d.size * 3}px ${d.color}, 0 0 ${d.size * 5}px ${d.color}`,
             animationDuration: `${d.dur}s`,
             animationDelay: `${d.delay}s`,
           }}

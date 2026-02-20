@@ -63,6 +63,7 @@ function computeResult(answers: ChoiceKey[]): CharacterKey {
 
 export default function HomePage() {
   const router = useRouter();
+  const [started, setStarted] = useState(false);
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<ChoiceKey[]>([]);
 
@@ -75,6 +76,10 @@ export default function HomePage() {
     () => `${Math.min(step + 1, questions.length)} / ${questions.length}`,
     [step]
   );
+
+  function startQuiz() {
+    setStarted(true);
+  }
 
   function pick(optionKey: ChoiceKey) {
     const next = [...answers];
@@ -96,24 +101,52 @@ export default function HomePage() {
   }
 
   function reset() {
+    setStarted(false);
     setStep(0);
     setAnswers([]);
   }
 
-  return (
-    <main className="min-h-screen flex items-center justify-center p-4 sm:p-6 text-white">
-      <div className="w-full max-w-xl neon-card p-6 sm:p-8 page-enter">
-        {/* Üst: logo + progress */}
-        <div className="flex items-center justify-between gap-4">
-          <span className="font-display text-sm font-semibold tracking-wide text-white/90">
+  /* Landing – before quiz */
+  if (!started) {
+    return (
+      <main className="min-h-screen flex items-center justify-center p-4 sm:p-6">
+        <div className="w-full max-w-xl ink-card p-8 sm:p-10 page-enter text-center">
+          <span className="font-display text-sm font-semibold tracking-wide ink-title opacity-90">
             TATSU TYPE
           </span>
-          <span className="text-xs font-medium tabular-nums text-white/60">
+          <h1 className="mt-6 font-display text-xl sm:text-2xl font-bold leading-tight ink-title">
+            Click to discover your TATSU type
+          </h1>
+          <p className="mt-3 text-sm opacity-70">
+            Answer a few short questions to find out which TATSU character you match.
+          </p>
+          <button
+            type="button"
+            onClick={startQuiz}
+            className="mt-8 ink-btn px-8 py-4 text-base font-semibold"
+          >
+            Start
+          </button>
+          <p className="mt-8 text-[11px] opacity-50">
+            Unofficial community tool. Not affiliated with Tatsu.
+          </p>
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <main className="min-h-screen flex items-center justify-center p-4 sm:p-6">
+      <div className="w-full max-w-xl ink-card p-6 sm:p-8 page-enter">
+        <div className="flex items-center justify-between gap-4">
+          <span className="font-display text-sm font-semibold tracking-wide ink-title opacity-90">
+            TATSU TYPE
+          </span>
+          <span className="text-xs font-medium tabular-nums opacity-70">
             {progressLabel}
           </span>
         </div>
 
-        {/* Progress bar */}
         <div className="mt-3 progress-track">
           <div
             className="progress-fill"
@@ -121,46 +154,43 @@ export default function HomePage() {
           />
         </div>
 
-        {/* Soru */}
-        <h1 className="mt-8 font-display text-xl sm:text-2xl font-bold leading-tight neon-title">
+        <h1 className="mt-8 font-display text-xl sm:text-2xl font-bold leading-tight ink-title">
           {current.title}
         </h1>
 
-        {/* Seçenekler */}
         <div className="mt-6 grid gap-3">
           {current.options.map((opt, i) => (
             <button
               key={opt.key}
               onClick={() => pick(opt.key)}
-              className="option-item neon-btn flex items-center gap-4 px-4 py-3.5 text-left rounded-2xl"
+              className="option-item ink-btn flex items-center gap-4 px-4 py-3.5 text-left"
               style={{ animationDelay: `${i * 50}ms` }}
             >
               <span className="option-badge">{opt.key}</span>
-              <span className="text-sm font-medium text-white/95">
+              <span className="text-sm font-medium">
                 {opt.label}
               </span>
             </button>
           ))}
         </div>
 
-        {/* Alt: Back + Restart */}
         <div className="mt-8 flex gap-3">
           <button
             onClick={back}
-            className="neon-btn rounded-xl px-4 py-2.5 text-sm font-medium disabled:opacity-40 disabled:pointer-events-none"
+            className="ink-btn px-4 py-2.5 text-sm font-medium disabled:opacity-40 disabled:pointer-events-none"
             disabled={step === 0}
           >
             Back
           </button>
           <button
             onClick={reset}
-            className="ml-auto neon-btn rounded-xl px-4 py-2.5 text-sm font-medium"
+            className="ml-auto ink-btn px-4 py-2.5 text-sm font-medium"
           >
             Restart
           </button>
         </div>
 
-        <p className="mt-6 text-[11px] text-white/50">
+        <p className="mt-6 text-[11px] opacity-50">
           Unofficial community tool. Not affiliated with Tatsu.
         </p>
       </div>

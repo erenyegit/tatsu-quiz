@@ -14,7 +14,7 @@ export default function ShareButton({ characterKey }: { characterKey: CharacterK
   return (
     <button
       onClick={onShare}
-      className="neon-btn rounded-xl px-4 py-2.5 text-sm font-medium"
+      className="ink-btn px-4 py-2.5 text-sm font-medium"
     >
       Share on X
     </button>

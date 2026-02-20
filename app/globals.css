@@ -1,18 +1,15 @@
 @import "tailwindcss";
 
+/* Anime siyah-beyaz karikatür / mürekkep paleti */
 :root {
-  --bg0: #030106;
-  --bg1: #0a0512;
-  --bg2: #120a1c;
-  --neon1: #a855f7;
-  --neon2: #22d3ee;
-  --neon3: #f472b6;
-  --neon4: #c084fc;
-  --accent: #e879f9;
-  --glow-strong: rgba(168, 85, 247, 0.5);
-  --glow-soft: rgba(168, 85, 247, 0.15);
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-glow: rgba(168, 85, 247, 0.4);
+  --ink-black: #0a0a0a;
+  --ink-white: #f5f5f0;
+  --ink-gray-1: #1a1a1a;
+  --ink-gray-2: #2d2d2d;
+  --ink-gray-3: #525252;
+  --ink-gray-4: #737373;
+  --ink-border: rgba(255, 255, 255, 0.12);
+  --ink-border-strong: rgba(255, 255, 255, 0.25);
 }
 
 html,
@@ -21,16 +18,222 @@ body {
 }
 
 body {
-  color: #faf5ff;
-  background:
-    radial-gradient(ellipse 140% 80% at 10% 0%, rgba(168, 85, 247, 0.2), transparent 50%),
-    radial-gradient(ellipse 100% 60% at 90% 10%, rgba(34, 211, 238, 0.15), transparent 45%),
-    radial-gradient(ellipse 80% 50% at 50% 100%, rgba(244, 114, 182, 0.12), transparent 45%),
-    linear-gradient(180deg, var(--bg1) 0%, var(--bg0) 100%);
+  color: var(--ink-white);
+  background: var(--ink-black);
   overflow-x: hidden;
 }
 
-/* Scanlines – daha hafif */
+.ink-bg-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ink-bg-image {
+  position: absolute;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.ink-bg-faded {
+  inset: 0;
+  background-image: url("/bg-ink.png");
+  opacity: 0.22;
+}
+
+.ink-bg-spot {
+  width: 60%;
+  height: 55%;
+  opacity: 0.12;
+  background-image: url("/bg-ink.png");
+}
+
+.ink-bg-spot-tl {
+  top: 0;
+  left: 0;
+  background-position: left top;
+}
+
+.ink-bg-spot-br {
+  bottom: 0;
+  right: 0;
+  background-position: right bottom;
+}
+
+.ink-bg-spot-mr {
+  top: 25%;
+  left: 25%;
+  width: 50%;
+  height: 50%;
+  background-position: center;
+}
+
+.dust-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.dust-cloud {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(ellipse 100% 100% at center, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+  filter: blur(24px);
+  animation: breeze linear infinite;
+}
+
+.dust-cloud-1 { width: 280px; height: 120px; left: 5%;  top: 20%; animation-duration: 28s; animation-delay: 0s; }
+.dust-cloud-2 { width: 200px; height: 90px;  right: 10%; top: 40%; animation-duration: 32s; animation-delay: -5s; }
+.dust-cloud-3 { width: 240px; height: 100px; left: 30%; bottom: 25%; animation-duration: 25s; animation-delay: -12s; }
+.dust-cloud-4 { width: 160px; height: 80px;  right: 25%; bottom: 15%; animation-duration: 30s; animation-delay: -3s; }
+.dust-cloud-5 { width: 220px; height: 95px; left: 50%; top: 10%; animation-duration: 26s; animation-delay: -8s; }
+.dust-cloud-6 { width: 180px; height: 85px; right: 5%; bottom: 40%; animation-duration: 29s; animation-delay: -15s; }
+
+@keyframes breeze {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+  25% { transform: translate(3vw, -2vh) scale(1.05); opacity: 0.9; }
+  50% { transform: translate(-2vw, 1.5vh) scale(0.98); opacity: 0.7; }
+  75% { transform: translate(2vw, 2vh) scale(1.02); opacity: 0.85; }
+}
+
+.ink-dust-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.ink-dust-particle {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 0 6px rgba(255, 255, 255, 0.9),
+    0 0 12px rgba(255, 255, 255, 0.5),
+    0 0 20px rgba(255, 255, 255, 0.25);
+  animation: inkDustFloat linear infinite;
+}
+
+@keyframes inkDustFloat {
+  0% { transform: translate(0, 100vh) scale(0.7); }
+  100% { transform: translate(4vw, -15vh) scale(1); }
+}
+
+/* Manga / anime tarzı kart – siyah beyaz */
+.ink-card {
+  position: relative;
+  border: 2px solid var(--ink-border-strong);
+  background: rgba(20, 20, 20, 0.92);
+  backdrop-filter: blur(16px);
+  border-radius: 4px;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.5) inset,
+    0 4px 0 0 var(--ink-gray-3),
+    0 8px 24px -8px rgba(0, 0, 0, 0.6);
+}
+
+.ink-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--ink-white);
+  opacity: 0.15;
+  border-radius: 4px 4px 0 0;
+}
+
+.ink-btn {
+  border: 2px solid var(--ink-border-strong);
+  background: var(--ink-gray-1);
+  color: var(--ink-white);
+  border-radius: 4px;
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ink-btn:hover {
+  background: var(--ink-gray-2);
+  box-shadow: 0 2px 0 0 var(--ink-gray-4);
+  transform: translateY(-1px);
+}
+
+.ink-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 0 0 0 var(--ink-gray-4);
+}
+
+.ink-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ink-title {
+  color: var(--ink-white);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.progress-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--ink-gray-1);
+  border: 1px solid var(--ink-border);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--ink-white);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes optionIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.option-item {
+  animation: optionIn 0.35s ease backwards;
+}
+
+@keyframes pageIn {
+  from { opacity: 0; transform: scale(0.99); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.page-enter {
+  animation: pageIn 0.3s ease-out;
+}
+
+.option-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 2px;
+  background: var(--ink-gray-2);
+  border: 2px solid var(--ink-border-strong);
+  font-weight: 800;
+  font-size: 0.75rem;
+  color: var(--ink-white);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 1px 0 0 var(--ink-gray-4);
+}
+
+.font-display {
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
 .scanlines::before {
   content: "";
   position: fixed;
@@ -38,197 +241,21 @@ body {
   pointer-events: none;
   background: repeating-linear-gradient(
     to bottom,
-    rgba(255, 255, 255, 0.02),
-    rgba(255, 255, 255, 0.02) 1px,
-    transparent 1px,
-    transparent 4px
+    transparent 0,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 3px
   );
-  mix-blend-mode: overlay;
-  opacity: 0.6;
+  opacity: 0.5;
+  z-index: 9999;
 }
 
-/* Film grain */
 .grain::after {
   content: "";
   position: fixed;
   inset: -20%;
   pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.2'/%3E%3C/svg%3E");
-  opacity: 0.04;
-  transform: translateZ(0);
-}
-
-/* Ana kart – NFT / panel hissi */
-.neon-card {
-  position: relative;
-  border: 1px solid var(--border-subtle);
-  background: linear-gradient(165deg, rgba(18, 10, 28, 0.85) 0%, rgba(3, 1, 6, 0.92) 100%);
-  backdrop-filter: blur(20px);
-  border-radius: 24px;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.03) inset,
-    0 25px 50px -12px rgba(0, 0, 0, 0.5),
-    0 0 60px -15px var(--glow-soft);
-}
-
-.neon-card::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: 24px;
-  padding: 1px;
-  background: linear-gradient(135deg, var(--neon1), var(--neon2), var(--neon3), var(--neon4));
-  background-size: 300% 300%;
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0.5;
-  pointer-events: none;
-  animation: borderShift 8s ease infinite;
-}
-
-@keyframes borderShift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-/* Köşe vurgusu – anime UI */
-.neon-card::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  border-radius: 24px 24px 0 0;
-  background: linear-gradient(90deg, transparent, var(--neon1), var(--neon2), transparent);
-  opacity: 0.7;
-  pointer-events: none;
-}
-
-/* Buton – seçenek kartları */
-.neon-btn {
-  border: 1px solid var(--border-subtle);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
-  border-radius: 16px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-}
-
-.neon-btn:hover {
-  transform: translateY(-2px);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
-  border-color: var(--border-glow);
-  box-shadow:
-    0 8px 24px -8px var(--glow-soft),
-    0 0 0 1px rgba(168, 85, 247, 0.2);
-}
-
-.neon-btn:active {
-  transform: translateY(0);
-}
-
-/* Başlık glow */
-.neon-title {
-  text-shadow:
-    0 0 20px var(--glow-soft),
-    0 0 40px rgba(168, 85, 247, 0.2);
-}
-
-/* Progress bar */
-.progress-track {
-  height: 4px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--neon1), var(--neon2));
-  box-shadow: 0 0 12px var(--glow-strong);
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Seçenek giriş animasyonu */
-@keyframes optionIn {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.option-item {
-  animation: optionIn 0.4s ease backwards;
-}
-
-/* Sayfa giriş */
-@keyframes pageIn {
-  from {
-    opacity: 0;
-    transform: scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.page-enter {
-  animation: pageIn 0.35s ease-out;
-}
-
-/* Particles */
-.particles {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.particle {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  border-radius: 999px;
-  opacity: 0.85;
-  filter: blur(0.2px);
-  animation: floatUp linear infinite;
-}
-
-@keyframes floatUp {
-  from {
-    transform: translate3d(0, 40vh, 0);
-    opacity: 0;
-  }
-  10% { opacity: 0.9; }
-  to {
-    transform: translate3d(0, -60vh, 0);
-    opacity: 0;
-  }
-}
-
-/* Badge (A, B, C…) */
-.option-badge {
-  width: 28px;
-  height: 28px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(34, 211, 238, 0.2));
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  font-weight: 700;
-  font-size: 0.75rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.font-display {
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.15'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  z-index: 9998;
 }

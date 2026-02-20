@@ -13,18 +13,18 @@ export default async function ResultPage({
   const c = characters[key] ?? characters.epseo;
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-4 sm:p-6 text-white">
-      <div className="w-full max-w-2xl neon-card p-6 sm:p-8 page-enter">
+    <main className="min-h-screen flex items-center justify-center p-4 sm:p-6">
+      <div className="w-full max-w-2xl ink-card p-6 sm:p-8 page-enter">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="font-display text-3xl font-bold neon-title">{c.name}</h1>
-            <p className="mt-1 text-white/80">{c.subtitle}</p>
-            <p className="mt-3 text-sm text-white/75 leading-relaxed">{c.description}</p>
+            <h1 className="font-display text-3xl font-bold ink-title">{c.name}</h1>
+            <p className="mt-1 opacity-80">{c.subtitle}</p>
+            <p className="mt-3 text-sm opacity-75 leading-relaxed">{c.description}</p>
           </div>
 
           <a
             href="/"
-            className="neon-btn rounded-xl px-4 py-2.5 text-sm font-medium shrink-0"
+            className="ink-btn px-4 py-2.5 text-sm font-medium shrink-0"
           >
             Retake
           </a>
@@ -47,7 +47,7 @@ export default async function ResultPage({
             href="https://x.com/tatsu_nyc"
             target="_blank"
             rel="noreferrer"
-            className="neon-btn rounded-xl px-4 py-2.5 text-sm font-medium"
+            className="ink-btn px-4 py-2.5 text-sm font-medium"
           >
             Tatsu on X
           </a>
