@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { toPng } from "html-to-image";
 
 export type CharacterInfo = { name: string; subtitle: string };
@@ -8,7 +8,6 @@ export type CharacterInfo = { name: string; subtitle: string };
 type Props = {
   twitterUsername: string;
   character?: CharacterInfo;
-  /** Kart arka plan görseli (örn. karaktere özel arka plan) */
   backgroundImage?: string;
   onReset?: () => void;
   showResetButton?: boolean;
@@ -27,15 +26,28 @@ export default function KimlikKarti({
   showResetButton = true,
 }: Props) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const [downloading, setDownloading] = useState(false);
 
   const handleDownload = async () => {
-    if (!cardRef.current) return;
+    const el = cardRef.current;
+    if (!el || downloading) return;
+    setDownloading(true);
+    const orig = {
+      width: el.style.width,
+      height: el.style.height,
+      maxWidth: el.style.maxWidth,
+    };
     try {
-      const dataUrl = await toPng(cardRef.current, {
+      el.style.width = "1000px";
+      el.style.height = "600px";
+      el.style.minWidth = "1000px";
+      el.style.minHeight = "600px";
+      el.style.maxWidth = "none";
+      await new Promise((r) => setTimeout(r, 200));
+      const dataUrl = await toPng(el, {
         backgroundColor: "#0a0a0a",
-        width: CARD_WIDTH,
-        height: CARD_HEIGHT,
-        cacheBust: true,
+        width: 1000,
+        height: 600,
       });
       const a = document.createElement("a");
       a.href = dataUrl;
@@ -43,6 +55,13 @@ export default function KimlikKarti({
       a.click();
     } catch (err) {
       console.error("Download error:", err);
+    } finally {
+      el.style.width = orig.width;
+      el.style.height = orig.height;
+      el.style.minWidth = "";
+      el.style.minHeight = "";
+      el.style.maxWidth = orig.maxWidth;
+      setDownloading(false);
     }
   };
 
@@ -85,9 +104,9 @@ export default function KimlikKarti({
           className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-white/25 object-cover ring-2 ring-black/30"
         />
       </div>
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 -translate-y-4">
         <p className="font-display text-xl sm:text-2xl font-bold text-white">
-          @{twitterUsername}
+          {twitterUsername}
         </p>
         {character && (
           <p className="text-sm text-white/70 mt-1">{character.subtitle}</p>
@@ -119,8 +138,21 @@ export default function KimlikKarti({
         {cardInner}
       </div>
 
+      {downloading && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+          aria-live="polite"
+        >
+          <p className="text-white font-medium">Preparing download…</p>
+        </div>
+      )}
+
       <div className="flex flex-wrap gap-3 justify-center">
-        <button onClick={handleDownload} className="ink-btn px-5 py-2.5 text-sm font-medium">
+        <button
+          onClick={handleDownload}
+          disabled={downloading}
+          className="ink-btn px-5 py-2.5 text-sm font-medium disabled:opacity-50"
+        >
           Download
         </button>
         <button onClick={handleShareOnX} className="ink-btn px-5 py-2.5 text-sm font-medium">
