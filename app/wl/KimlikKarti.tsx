@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useRef, useState, useCallback } from "react";
+import { toPng } from "html-to-image";
 
 export type CharacterInfo = { name: string; subtitle: string };
 
@@ -15,6 +16,20 @@ type Props = {
 
 const AVATAR_URL = (username: string) => `/api/avatar/${encodeURIComponent(username)}`;
 
+function waitForImages(el: HTMLElement): Promise<void> {
+  const imgs = Array.from(el.querySelectorAll("img"));
+  const pending = imgs
+    .filter((img) => !img.complete)
+    .map(
+      (img) =>
+        new Promise<void>((resolve) => {
+          img.onload = () => resolve();
+          img.onerror = () => resolve();
+        })
+    );
+  return Promise.all(pending).then(() => undefined);
+}
+
 export default function KimlikKarti({
   twitterUsername,
   character,
@@ -23,31 +38,47 @@ export default function KimlikKarti({
   onReset,
   showResetButton = true,
 }: Props) {
+  const cardRef = useRef<HTMLDivElement>(null);
   const [downloading, setDownloading] = useState(false);
 
   const handleDownload = useCallback(async () => {
-    if (downloading) return;
+    const el = cardRef.current;
+    if (!el || downloading) return;
     setDownloading(true);
     try {
-      const params = new URLSearchParams({
-        username: twitterUsername,
-        character: characterKey || "epseo",
+      await document.fonts.ready;
+      await waitForImages(el);
+
+      const centerDiv = el.querySelector("[data-center]") as HTMLElement | null;
+      const origTransform = centerDiv?.style.transform ?? "";
+      if (centerDiv) centerDiv.style.transform = "none";
+
+      const w = el.offsetWidth;
+      const h = el.offsetHeight;
+
+      const dataUrl = await toPng(el, {
+        backgroundColor: "#0a0a0a",
+        width: w,
+        height: h,
+        pixelRatio: 3,
+        style: {
+          margin: "0",
+          transform: "none",
+        },
       });
-      const res = await fetch(`/api/card?${params}`);
-      if (!res.ok) throw new Error("Failed to generate card");
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
+
+      if (centerDiv) centerDiv.style.transform = origTransform;
+
       const a = document.createElement("a");
-      a.href = url;
+      a.href = dataUrl;
       a.download = `tatsu-${twitterUsername}.png`;
       a.click();
-      URL.revokeObjectURL(url);
     } catch (err) {
       console.error("Download error:", err);
     } finally {
       setDownloading(false);
     }
-  }, [downloading, twitterUsername, characterKey]);
+  }, [downloading, twitterUsername]);
 
   const handleShareOnX = () => {
     const origin = typeof window !== "undefined" ? window.location.origin : "";
@@ -87,7 +118,9 @@ export default function KimlikKarti({
       </div>
 
       <div
-        className="relative w-full aspect-[40/21] max-w-md mx-auto rounded-lg overflow-hidden bg-[#0a0a0a]"
+        id="identity-card"
+        ref={cardRef}
+        className="relative w-full aspect-[5/3] max-w-md mx-auto rounded-lg overflow-hidden bg-[#0a0a0a]"
         style={cardStyle}
       >
         <div className="absolute top-4 right-4 z-10">
@@ -104,12 +137,16 @@ export default function KimlikKarti({
             className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-white/25 object-cover ring-2 ring-black/30"
           />
         </div>
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
-          <p className="font-display text-xl sm:text-2xl font-bold text-white drop-shadow-lg">
+        <div
+          data-center
+          className="absolute inset-0 flex flex-col items-center justify-center gap-1"
+          style={{ transform: "translateY(-16px)" }}
+        >
+          <p className="font-display text-xl sm:text-2xl font-bold text-white">
             {twitterUsername}
           </p>
           {character && (
-            <p className="text-sm text-white/70 mt-1 drop-shadow-md">{character.subtitle}</p>
+            <p className="text-sm text-white/70 mt-1">{character.subtitle}</p>
           )}
         </div>
         <div
