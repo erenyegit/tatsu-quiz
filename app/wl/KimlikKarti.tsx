@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useCallback } from "react";
 import { toPng } from "html-to-image";
 
 export type CharacterInfo = { name: string; subtitle: string };
@@ -16,8 +16,19 @@ type Props = {
 
 const AVATAR_URL = (username: string) => `/api/avatar/${encodeURIComponent(username)}`;
 
-const CARD_WIDTH = 1000;
-const CARD_HEIGHT = 600;
+function waitForImages(el: HTMLElement): Promise<void> {
+  const imgs = Array.from(el.querySelectorAll("img"));
+  const pending = imgs
+    .filter((img) => !img.complete)
+    .map(
+      (img) =>
+        new Promise<void>((resolve) => {
+          img.onload = () => resolve();
+          img.onerror = () => resolve();
+        })
+    );
+  return Promise.all(pending).then(() => undefined);
+}
 
 export default function KimlikKarti({
   twitterUsername,
@@ -30,42 +41,44 @@ export default function KimlikKarti({
   const cardRef = useRef<HTMLDivElement>(null);
   const [downloading, setDownloading] = useState(false);
 
-  const handleDownload = async () => {
+  const handleDownload = useCallback(async () => {
     const el = cardRef.current;
     if (!el || downloading) return;
     setDownloading(true);
-    const orig = {
-      width: el.style.width,
-      height: el.style.height,
-      maxWidth: el.style.maxWidth,
-    };
     try {
-      el.style.width = "1000px";
-      el.style.height = "600px";
-      el.style.minWidth = "1000px";
-      el.style.minHeight = "600px";
-      el.style.maxWidth = "none";
-      await new Promise((r) => setTimeout(r, 200));
+      await document.fonts.ready;
+      await waitForImages(el);
+
+      const centerDiv = el.querySelector("[data-center]") as HTMLElement | null;
+      const origTransform = centerDiv?.style.transform ?? "";
+      if (centerDiv) centerDiv.style.transform = "none";
+
+      const w = el.offsetWidth;
+      const h = el.offsetHeight;
+
       const dataUrl = await toPng(el, {
         backgroundColor: "#0a0a0a",
-        width: 1000,
-        height: 600,
+        width: w,
+        height: h,
+        pixelRatio: 3,
+        style: {
+          margin: "0",
+          transform: "none",
+        },
       });
+
+      if (centerDiv) centerDiv.style.transform = origTransform;
+
       const a = document.createElement("a");
       a.href = dataUrl;
-      a.download = `tatsu-kimlik-${twitterUsername}.png`;
+      a.download = `tatsu-${twitterUsername}.png`;
       a.click();
     } catch (err) {
       console.error("Download error:", err);
     } finally {
-      el.style.width = orig.width;
-      el.style.height = orig.height;
-      el.style.minWidth = "";
-      el.style.minHeight = "";
-      el.style.maxWidth = orig.maxWidth;
       setDownloading(false);
     }
-  };
+  }, [downloading, twitterUsername]);
 
   const handleShareOnX = () => {
     const origin = typeof window !== "undefined" ? window.location.origin : "";
@@ -93,37 +106,6 @@ export default function KimlikKarti({
     boxShadow: "0 0 0 1px rgba(0,0,0,0.5) inset, 0 8px 24px -8px rgba(0,0,0,0.6)",
   };
 
-  const cardInner = (
-    <>
-      <div className="absolute top-4 right-4 z-10">
-        <img
-          src={AVATAR_URL(twitterUsername)}
-          alt={`@${twitterUsername}`}
-          className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-white/25 object-cover ring-2 ring-black/30"
-        />
-      </div>
-      <div className="absolute top-4 left-4 z-10">
-        <img
-          src="/tatsu-logo.png"
-          alt="TATSU"
-          className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-white/25 object-cover ring-2 ring-black/30"
-        />
-      </div>
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 -translate-y-4">
-        <p className="font-display text-xl sm:text-2xl font-bold text-white">
-          {twitterUsername}
-        </p>
-        {character && (
-          <p className="text-sm text-white/70 mt-1">{character.subtitle}</p>
-        )}
-      </div>
-      <div
-        className="absolute bottom-0 left-0 right-0 h-1"
-        style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)" }}
-      />
-    </>
-  );
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -136,11 +118,41 @@ export default function KimlikKarti({
       </div>
 
       <div
+        id="identity-card"
         ref={cardRef}
         className="relative w-full aspect-[5/3] max-w-md mx-auto rounded-lg overflow-hidden bg-[#0a0a0a]"
         style={cardStyle}
       >
-        {cardInner}
+        <div className="absolute top-4 right-4 z-10">
+          <img
+            src={AVATAR_URL(twitterUsername)}
+            alt={`@${twitterUsername}`}
+            className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-white/25 object-cover ring-2 ring-black/30"
+          />
+        </div>
+        <div className="absolute top-4 left-4 z-10">
+          <img
+            src="/tatsu-logo.png"
+            alt="TATSU"
+            className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-white/25 object-cover ring-2 ring-black/30"
+          />
+        </div>
+        <div
+          data-center
+          className="absolute inset-0 flex flex-col items-center justify-center gap-1"
+          style={{ transform: "translateY(-16px)" }}
+        >
+          <p className="font-display text-xl sm:text-2xl font-bold text-white">
+            {twitterUsername}
+          </p>
+          {character && (
+            <p className="text-sm text-white/70 mt-1">{character.subtitle}</p>
+          )}
+        </div>
+        <div
+          className="absolute bottom-0 left-0 right-0 h-1"
+          style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)" }}
+        />
       </div>
 
       {downloading && (
