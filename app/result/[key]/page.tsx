@@ -15,7 +15,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
   if (!c) return {};
 
   const user = username?.replace(/^@/, "").trim().toLowerCase() || "tatsu";
-  const ogUrl = `/api/og?username=${encodeURIComponent(user)}&character=${key}`;
+  const ogUrl = `/api/card?username=${encodeURIComponent(user)}&character=${key}`;
   const title = `${user} — ${c.name} | Tatsu Type`;
   const description = `${c.subtitle}: ${c.description}`;
 
