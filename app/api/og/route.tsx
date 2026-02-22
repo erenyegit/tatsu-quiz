@@ -30,6 +30,10 @@ export async function GET(req: NextRequest) {
   const baseUrl = req.nextUrl.origin;
   const bgUrl = `${baseUrl}${bgPath}`;
   const logoUrl = `${baseUrl}/tatsu-logo.png`;
+  const avatarUrl = `${baseUrl}/api/avatar/${encodeURIComponent(username)}`;
+
+  const circleSize = 80;
+  const padding = 32;
 
   return new ImageResponse(
     (
@@ -42,6 +46,7 @@ export async function GET(req: NextRequest) {
           overflow: "hidden",
           borderRadius: 12,
           backgroundColor: "#0a0a0a",
+          border: "2px solid rgba(255,255,255,0.15)",
         }}
       >
         {/* Arka plan */}
@@ -57,31 +62,49 @@ export async function GET(req: NextRequest) {
           }}
         />
 
-        {/* Sol üst - logo */}
+        {/* Sol üst - TATSU logo */}
         <div
           style={{
             position: "absolute",
-            top: 24,
-            left: 24,
-            width: 72,
-            height: 72,
+            top: padding,
+            left: padding,
+            width: circleSize,
+            height: circleSize,
             borderRadius: "50%",
             overflow: "hidden",
-            border: "3px solid rgba(255,255,255,0.25)",
+            border: "2px solid rgba(255,255,255,0.25)",
             display: "flex",
+            boxShadow: "0 0 0 2px rgba(0,0,0,0.3)",
           }}
         >
           <img
             src={logoUrl}
-            style={{
-              width: 72,
-              height: 72,
-              objectFit: "cover",
-            }}
+            style={{ width: circleSize, height: circleSize, objectFit: "cover" }}
           />
         </div>
 
-        {/* Orta - kullanıcı adı + type */}
+        {/* Sağ üst - profil fotoğrafı */}
+        <div
+          style={{
+            position: "absolute",
+            top: padding,
+            right: padding,
+            width: circleSize,
+            height: circleSize,
+            borderRadius: "50%",
+            overflow: "hidden",
+            border: "2px solid rgba(255,255,255,0.25)",
+            display: "flex",
+            boxShadow: "0 0 0 2px rgba(0,0,0,0.3)",
+          }}
+        >
+          <img
+            src={avatarUrl}
+            style={{ width: circleSize, height: circleSize, objectFit: "cover" }}
+          />
+        </div>
+
+        {/* Orta - kullanıcı adı + type (sitedeki gibi) */}
         <div
           style={{
             position: "absolute",
@@ -93,26 +116,26 @@ export async function GET(req: NextRequest) {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            transform: "translateY(-20px)",
+            transform: "translateY(-24px)",
           }}
         >
           <p
             style={{
-              fontSize: 48,
+              fontSize: 52,
               fontWeight: 700,
               color: "white",
               margin: 0,
-              textShadow: "0 2px 8px rgba(0,0,0,0.7)",
+              textShadow: "0 2px 12px rgba(0,0,0,0.8)",
             }}
           >
             {username}
           </p>
           <p
             style={{
-              fontSize: 20,
-              color: "rgba(255,255,255,0.7)",
-              marginTop: 8,
-              textShadow: "0 1px 4px rgba(0,0,0,0.6)",
+              fontSize: 22,
+              color: "rgba(255,255,255,0.75)",
+              marginTop: 10,
+              textShadow: "0 1px 6px rgba(0,0,0,0.6)",
             }}
           >
             {subtitle}
