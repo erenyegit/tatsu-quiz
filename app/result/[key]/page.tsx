@@ -25,7 +25,15 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
     openGraph: {
       title,
       description,
-      images: [{ url: ogUrl, width: 1200, height: 720 }],
+      type: "website",
+      images: [
+        {
+          url: ogUrl,
+          width: 1200,
+          height: 630,
+          alt: `Tatsu identity card — ${user}, ${c.subtitle}`,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",

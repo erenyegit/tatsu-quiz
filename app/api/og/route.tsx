@@ -19,6 +19,9 @@ const CHARACTER_SUBTITLES: Record<string, string> = {
   fushi: "ENDURANCE TYPE",
 };
 
+const OG_W = 1200;
+const OG_H = 630;
+
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const username = searchParams.get("username") || "tatsu";
@@ -32,37 +35,35 @@ export async function GET(req: NextRequest) {
   const logoUrl = `${baseUrl}/tatsu-logo.png`;
   const avatarUrl = `${baseUrl}/api/avatar/${encodeURIComponent(username)}`;
 
-  const W = 1200;
-  const H = 720;
-  const circle = 96;
-  const pad = 36;
+  const circle = 88;
+  const pad = 32;
 
   return new ImageResponse(
     (
       <div
         style={{
-          width: W,
-          height: H,
+          width: OG_W,
+          height: OG_H,
           display: "flex",
           position: "relative",
           overflow: "hidden",
           backgroundColor: "#0a0a0a",
+          border: "2px solid rgba(255,255,255,0.15)",
+          boxSizing: "border-box",
         }}
       >
-        {/* Arka plan - tam kaplama */}
         <img
           src={bgUrl}
           style={{
             position: "absolute",
             top: 0,
             left: 0,
-            width: W,
-            height: H,
+            width: OG_W,
+            height: OG_H,
             objectFit: "cover",
           }}
         />
 
-        {/* Sol üst - TATSU logo */}
         <div
           style={{
             position: "absolute",
@@ -72,7 +73,7 @@ export async function GET(req: NextRequest) {
             height: circle,
             borderRadius: "50%",
             overflow: "hidden",
-            border: "3px solid rgba(255,255,255,0.3)",
+            border: "3px solid rgba(255,255,255,0.25)",
             display: "flex",
             boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
           }}
@@ -83,7 +84,6 @@ export async function GET(req: NextRequest) {
           />
         </div>
 
-        {/* Sağ üst - profil fotoğrafı */}
         <div
           style={{
             position: "absolute",
@@ -93,7 +93,7 @@ export async function GET(req: NextRequest) {
             height: circle,
             borderRadius: "50%",
             overflow: "hidden",
-            border: "3px solid rgba(255,255,255,0.3)",
+            border: "3px solid rgba(255,255,255,0.25)",
             display: "flex",
             boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
           }}
@@ -104,7 +104,6 @@ export async function GET(req: NextRequest) {
           />
         </div>
 
-        {/* Orta - kullanıcı adı + type */}
         <div
           style={{
             position: "absolute",
@@ -116,12 +115,12 @@ export async function GET(req: NextRequest) {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            paddingBottom: 40,
+            paddingBottom: 28,
           }}
         >
           <p
             style={{
-              fontSize: 60,
+              fontSize: 56,
               fontWeight: 700,
               color: "white",
               margin: 0,
@@ -133,9 +132,9 @@ export async function GET(req: NextRequest) {
           </p>
           <p
             style={{
-              fontSize: 24,
+              fontSize: 22,
               color: "rgba(255,255,255,0.75)",
-              marginTop: 12,
+              marginTop: 10,
               textShadow: "0 1px 8px rgba(0,0,0,0.7)",
               letterSpacing: "0.05em",
             }}
@@ -144,7 +143,6 @@ export async function GET(req: NextRequest) {
           </p>
         </div>
 
-        {/* Alt dekoratif çizgi */}
         <div
           style={{
             position: "absolute",
@@ -159,8 +157,8 @@ export async function GET(req: NextRequest) {
       </div>
     ),
     {
-      width: W,
-      height: H,
+      width: OG_W,
+      height: OG_H,
     }
   );
 }
