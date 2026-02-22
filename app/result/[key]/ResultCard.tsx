@@ -25,6 +25,7 @@ export default function ResultCard({ characterKey, username }: Props) {
       <KimlikKarti
         twitterUsername={displayUsername}
         character={{ name: c.name, subtitle: c.subtitle }}
+        characterKey={characterKey}
         backgroundImage={
           characterKey === "epseo"
             ? "/cards/epseo.png"

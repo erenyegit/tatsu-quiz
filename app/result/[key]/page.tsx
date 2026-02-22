@@ -1,13 +1,42 @@
+import type { Metadata } from "next";
 import { characters, type CharacterKey } from "../../../lib/characters";
 import ResultCard from "./ResultCard";
 
-export default async function ResultPage({
-  params,
-  searchParams,
-}: {
+type PageProps = {
   params: Promise<{ key: string }>;
   searchParams: Promise<{ username?: string }>;
-}) {
+};
+
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
+  const { key: rawKey } = await params;
+  const { username } = await searchParams;
+  const key = (rawKey || "").toLowerCase().trim() as CharacterKey;
+  const c = characters[key];
+  if (!c) return {};
+
+  const user = username?.replace(/^@/, "").trim().toLowerCase() || "tatsu";
+  const ogUrl = `/api/og?username=${encodeURIComponent(user)}&character=${key}`;
+  const title = `${user} — ${c.name} | Tatsu Type`;
+  const description = `${c.subtitle}: ${c.description}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [{ url: ogUrl, width: 1000, height: 600 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogUrl],
+    },
+  };
+}
+
+export default async function ResultPage({ params, searchParams }: PageProps) {
   const { key: rawKey } = await params;
   const { username } = await searchParams;
   const key = (rawKey || "").toLowerCase().trim() as CharacterKey;

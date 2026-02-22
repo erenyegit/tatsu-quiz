@@ -8,6 +8,7 @@ export type CharacterInfo = { name: string; subtitle: string };
 type Props = {
   twitterUsername: string;
   character?: CharacterInfo;
+  characterKey?: string;
   backgroundImage?: string;
   onReset?: () => void;
   showResetButton?: boolean;
@@ -21,6 +22,7 @@ const CARD_HEIGHT = 600;
 export default function KimlikKarti({
   twitterUsername,
   character,
+  characterKey,
   backgroundImage,
   onReset,
   showResetButton = true,
@@ -65,12 +67,15 @@ export default function KimlikKarti({
     }
   };
 
-  const shareText = character
-    ? `🐉 My Tatsu type: ${character.name} — ${character.subtitle}\n\n@${twitterUsername}\n\n@tatsu_nyc`
-    : `🐉 My Tatsu WL identity card is ready!\n\n@${twitterUsername}\n\n@tatsu_nyc`;
-
   const handleShareOnX = () => {
-    const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const resultUrl = characterKey
+      ? `${origin}/result/${characterKey}?username=${encodeURIComponent(twitterUsername)}`
+      : "";
+    const text = character
+      ? `🐉 My Tatsu type: ${character.name} — ${character.subtitle}\n\n@tatsu_nyc`
+      : `🐉 My Tatsu WL identity card is ready!\n\n@tatsu_nyc`;
+    const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(resultUrl)}`;
     window.open(intent, "_blank", "noopener,noreferrer");
   };
 
