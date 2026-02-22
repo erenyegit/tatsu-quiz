@@ -25,7 +25,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
     openGraph: {
       title,
       description,
-      images: [{ url: ogUrl, width: 1000, height: 600 }],
+      images: [{ url: ogUrl, width: 1200, height: 720 }],
     },
     twitter: {
       card: "summary_large_image",

@@ -32,32 +32,32 @@ export async function GET(req: NextRequest) {
   const logoUrl = `${baseUrl}/tatsu-logo.png`;
   const avatarUrl = `${baseUrl}/api/avatar/${encodeURIComponent(username)}`;
 
-  const circleSize = 80;
-  const padding = 32;
+  const W = 1200;
+  const H = 720;
+  const circle = 96;
+  const pad = 36;
 
   return new ImageResponse(
     (
       <div
         style={{
-          width: 1000,
-          height: 600,
+          width: W,
+          height: H,
           display: "flex",
           position: "relative",
           overflow: "hidden",
-          borderRadius: 12,
           backgroundColor: "#0a0a0a",
-          border: "2px solid rgba(255,255,255,0.15)",
         }}
       >
-        {/* Arka plan */}
+        {/* Arka plan - tam kaplama */}
         <img
           src={bgUrl}
           style={{
             position: "absolute",
             top: 0,
             left: 0,
-            width: 1000,
-            height: 600,
+            width: W,
+            height: H,
             objectFit: "cover",
           }}
         />
@@ -66,20 +66,20 @@ export async function GET(req: NextRequest) {
         <div
           style={{
             position: "absolute",
-            top: padding,
-            left: padding,
-            width: circleSize,
-            height: circleSize,
+            top: pad,
+            left: pad,
+            width: circle,
+            height: circle,
             borderRadius: "50%",
             overflow: "hidden",
-            border: "2px solid rgba(255,255,255,0.25)",
+            border: "3px solid rgba(255,255,255,0.3)",
             display: "flex",
-            boxShadow: "0 0 0 2px rgba(0,0,0,0.3)",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
           }}
         >
           <img
             src={logoUrl}
-            style={{ width: circleSize, height: circleSize, objectFit: "cover" }}
+            style={{ width: circle, height: circle, objectFit: "cover" }}
           />
         </div>
 
@@ -87,24 +87,24 @@ export async function GET(req: NextRequest) {
         <div
           style={{
             position: "absolute",
-            top: padding,
-            right: padding,
-            width: circleSize,
-            height: circleSize,
+            top: pad,
+            right: pad,
+            width: circle,
+            height: circle,
             borderRadius: "50%",
             overflow: "hidden",
-            border: "2px solid rgba(255,255,255,0.25)",
+            border: "3px solid rgba(255,255,255,0.3)",
             display: "flex",
-            boxShadow: "0 0 0 2px rgba(0,0,0,0.3)",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
           }}
         >
           <img
             src={avatarUrl}
-            style={{ width: circleSize, height: circleSize, objectFit: "cover" }}
+            style={{ width: circle, height: circle, objectFit: "cover" }}
           />
         </div>
 
-        {/* Orta - kullanıcı adı + type (sitedeki gibi) */}
+        {/* Orta - kullanıcı adı + type */}
         <div
           style={{
             position: "absolute",
@@ -116,33 +116,35 @@ export async function GET(req: NextRequest) {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            transform: "translateY(-24px)",
+            paddingBottom: 40,
           }}
         >
           <p
             style={{
-              fontSize: 52,
+              fontSize: 60,
               fontWeight: 700,
               color: "white",
               margin: 0,
-              textShadow: "0 2px 12px rgba(0,0,0,0.8)",
+              textShadow: "0 2px 16px rgba(0,0,0,0.9), 0 0 4px rgba(0,0,0,0.5)",
+              letterSpacing: "-0.01em",
             }}
           >
             {username}
           </p>
           <p
             style={{
-              fontSize: 22,
+              fontSize: 24,
               color: "rgba(255,255,255,0.75)",
-              marginTop: 10,
-              textShadow: "0 1px 6px rgba(0,0,0,0.6)",
+              marginTop: 12,
+              textShadow: "0 1px 8px rgba(0,0,0,0.7)",
+              letterSpacing: "0.05em",
             }}
           >
             {subtitle}
           </p>
         </div>
 
-        {/* Alt çizgi */}
+        {/* Alt dekoratif çizgi */}
         <div
           style={{
             position: "absolute",
@@ -151,14 +153,14 @@ export async function GET(req: NextRequest) {
             right: 0,
             height: 4,
             background:
-              "linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)",
+              "linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent)",
           }}
         />
       </div>
     ),
     {
-      width: 1000,
-      height: 600,
+      width: W,
+      height: H,
     }
   );
 }
