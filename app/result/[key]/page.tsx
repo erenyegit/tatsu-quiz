@@ -1,58 +1,33 @@
-import Image from "next/image";
-import ShareButton from "./ShareButton";
 import { characters, type CharacterKey } from "../../../lib/characters";
+import ResultCard from "./ResultCard";
 
 export default async function ResultPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ key: string }>;
+  searchParams: Promise<{ username?: string }>;
 }) {
   const { key: rawKey } = await params;
+  const { username } = await searchParams;
   const key = (rawKey || "").toLowerCase().trim() as CharacterKey;
 
-  const c = characters[key] ?? characters.epseo;
+  if (!characters[key]) {
+    return (
+      <main className="min-h-screen flex items-center justify-center p-4">
+        <div className="ink-card p-8 text-center">
+          <p className="ink-title">Result not found.</p>
+          <a href="/" className="ink-btn mt-4 inline-block px-4 py-2.5 text-sm">
+            Back to home
+          </a>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen flex items-center justify-center p-4 sm:p-6">
-      <div className="w-full max-w-2xl ink-card p-6 sm:p-8 page-enter">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="font-display text-3xl font-bold ink-title">{c.name}</h1>
-            <p className="mt-1 opacity-80">{c.subtitle}</p>
-            <p className="mt-3 text-sm opacity-75 leading-relaxed">{c.description}</p>
-          </div>
-
-          <a
-            href="/"
-            className="ink-btn px-4 py-2.5 text-sm font-medium shrink-0"
-          >
-            Retake
-          </a>
-        </div>
-
-        <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-black/40 shadow-xl">
-          <Image
-            src={c.image}
-            alt={c.name}
-            width={1200}
-            height={800}
-            className="w-full h-auto"
-            priority
-          />
-        </div>
-
-        <div className="mt-6 flex flex-wrap gap-3">
-          <ShareButton characterKey={c.key} />
-          <a
-            href="https://x.com/tatsu_nyc"
-            target="_blank"
-            rel="noreferrer"
-            className="ink-btn px-4 py-2.5 text-sm font-medium"
-          >
-            Tatsu on X
-          </a>
-        </div>
-      </div>
+      <ResultCard characterKey={key} username={username ?? null} />
     </main>
   );
 }

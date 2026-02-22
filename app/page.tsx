@@ -63,6 +63,7 @@ function computeResult(answers: ChoiceKey[]): CharacterKey {
 
 export default function HomePage() {
   const router = useRouter();
+  const [twitterUsername, setTwitterUsername] = useState("");
   const [started, setStarted] = useState(false);
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<ChoiceKey[]>([]);
@@ -92,7 +93,8 @@ export default function HomePage() {
     }
 
     const result = computeResult(next);
-    router.push(`/result/${result}`);
+    const user = twitterUsername.replace(/^@/, "").trim().toLowerCase();
+    router.push(`/result/${result}${user ? `?username=${encodeURIComponent(user)}` : ""}`);
   }
 
   function back() {
@@ -101,32 +103,52 @@ export default function HomePage() {
   }
 
   function reset() {
+    setTwitterUsername("");
     setStarted(false);
     setStep(0);
     setAnswers([]);
   }
 
-  /* Landing – before quiz */
+  function handleStart(e: React.FormEvent) {
+    e.preventDefault();
+    const user = twitterUsername.replace(/^@/, "").trim();
+    if (!user) return;
+    setStarted(true);
+  }
+
+  /* Landing – önce kullanıcı adı, sonra quiz */
   if (!started) {
     return (
       <main className="min-h-screen flex items-center justify-center p-4 sm:p-6">
-        <div className="w-full max-w-xl ink-card p-8 sm:p-10 page-enter text-center">
+        <div className="w-full max-w-xl ink-card p-8 sm:p-10 page-enter">
           <span className="font-display text-sm font-semibold tracking-wide ink-title opacity-90">
             TATSU TYPE
           </span>
           <h1 className="mt-6 font-display text-xl sm:text-2xl font-bold leading-tight ink-title">
-            Click to discover your TATSU type
+            Discover your TATSU type, get your identity card
           </h1>
           <p className="mt-3 text-sm opacity-70">
-            Answer a few short questions to find out which TATSU character you match.
+            Enter your X (Twitter) username, answer a few questions and create your identity card based on your character type.
           </p>
-          <button
-            type="button"
-            onClick={startQuiz}
-            className="mt-8 ink-btn px-8 py-4 text-base font-semibold"
-          >
-            Start
-          </button>
+          <form onSubmit={handleStart} className="mt-8">
+            <label className="block text-left text-sm font-medium opacity-80 mb-2">
+              Your X username
+            </label>
+            <input
+              type="text"
+              value={twitterUsername}
+              onChange={(e) => setTwitterUsername(e.target.value)}
+              placeholder="@username"
+              className="w-full px-4 py-3 bg-[var(--ink-gray-1)] border-2 border-[var(--ink-border-strong)] rounded text-[var(--ink-white)] placeholder:opacity-50 focus:outline-none focus:ring-2 focus:ring-white/30 mb-6"
+              required
+            />
+            <button
+              type="submit"
+              className="ink-btn px-8 py-4 text-base font-semibold w-full"
+            >
+              Start
+            </button>
+          </form>
           <p className="mt-8 text-[11px] opacity-50">
             Unofficial community tool. Not affiliated with Tatsu.
           </p>
